@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 import type { Post, PostMetadata } from '@/tipos/blog';
+import { getAllSanityPosts, getSanityPostBySlug } from './api/sanity-posts';
 
 // Re-export para manter compatibilidade
 export type { Post, PostMetadata };
@@ -47,32 +48,77 @@ function parsePostFile(filename: string): Post {
 }
 
 /**
- * Retorna todos os posts publicados, ordenados por data (mais recentes primeiro)
+ * Retorna todos os posts publicados (MDX + Sanity), ordenados por data (mais recentes primeiro)
  * @returns Array de metadados dos posts
  */
-export function getAllPosts(): PostMetadata[] {
-  const files = getPostFiles();
-  const posts = files
-    .map((filename) => parsePostFile(filename))
-    .filter((post) => post.published === true)
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+export async function getAllPosts(): Promise<PostMetadata[]> {
+  try {
+    // Obter posts do MDX
+    const mdxFiles = getPostFiles();
+    const mdxPosts = mdxFiles
+      .map((filename) => parsePostFile(filename))
+      .filter((post) => post.published === true);
 
-  return posts.map(({ ...metadata }) => metadata);
+    // Obter posts do Sanity
+    const sanityPosts = await getAllSanityPosts();
+
+    // Mesclar e desduplicar posts
+    const allPosts = [...mdxPosts, ...sanityPosts];
+    const uniquePosts = deduplicatePosts(allPosts);
+
+    // Ordenar por data (mais recentes primeiro)
+    uniquePosts.sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+    );
+
+    return uniquePosts.map(
+      ({ content, readingTime, published, ...metadata }) => ({
+        ...metadata,
+        readingTime: readingTime || '1 min de leitura',
+        published: published === true,
+      }),
+    );
+  } catch (error) {
+    console.error('Erro ao buscar posts:', error);
+    // Fallback: retornar apenas posts MDX
+    const mdxFiles = getPostFiles();
+    const posts = mdxFiles
+      .map((filename) => parsePostFile(filename))
+      .filter((post) => post.published === true)
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+    return posts.map(({ ...metadata }) => metadata);
+  }
 }
 
 /**
- * Busca um post específico pelo slug
+ * Busca um post específico pelo slug (MDX ou Sanity)
  * @param slug - Identificador único do post (nome do arquivo sem extensão)
  * @returns Post completo com conteúdo, ou null se não encontrado
  */
-export function getPostBySlug(slug: string): Post | null {
+export async function getPostBySlug(slug: string): Promise<Post | null> {
+  // Tentar buscar do MDX primeiro
   try {
     const filename = `${slug}.mdx`;
     const post = parsePostFile(filename);
-    return post.published === true ? post : null;
+    if (post.published === true) {
+      return post;
+    }
   } catch {
-    return null;
+    // Arquivo MDX não encontrado, tenter Sanity
   }
+
+  // Buscar do Sanity
+  try {
+    const sanityPost = await getSanityPostBySlug(slug);
+    if (sanityPost && sanityPost.published === true) {
+      return sanityPost;
+    }
+  } catch (error) {
+    console.error('Erro ao buscar post do Sanity:', error);
+  }
+
+  return null;
 }
 
 /**
@@ -81,7 +127,7 @@ export function getPostBySlug(slug: string): Post | null {
  * @returns Post completo com conteúdo, ou null se não encontrado
  * @deprecated Use getPostBySlug diretamente
  */
-export function getPostContent(slug: string): Post | null {
+export async function getPostContent(slug: string): Promise<Post | null> {
   return getPostBySlug(slug);
 }
 
@@ -90,9 +136,16 @@ export function getPostContent(slug: string): Post | null {
  * @param category - Nome da categoria
  * @returns Array de posts da categoria especificada
  */
-export function getPostsByCategory(category: string): PostMetadata[] {
-  const allPosts = getAllPosts();
-  return allPosts.filter((post) => post.category === category);
+export async function getPostsByCategory(
+  category: string,
+): Promise<PostMetadata[]> {
+  try {
+    const allPosts = await getAllPosts();
+    return allPosts.filter((post) => post.category === category);
+  } catch (error) {
+    console.error('Erro ao filtrar posts por categoria:', error);
+    return [];
+  }
 }
 
 /**
@@ -100,29 +153,59 @@ export function getPostsByCategory(category: string): PostMetadata[] {
  * @param tag - Nome da tag
  * @returns Array de posts que contêm a tag especificada
  */
-export function getPostsByTag(tag: string): PostMetadata[] {
-  const allPosts = getAllPosts();
-  return allPosts.filter((post) => post.tags.includes(tag));
+export async function getPostsByTag(tag: string): Promise<PostMetadata[]> {
+  try {
+    const allPosts = await getAllPosts();
+    return allPosts.filter((post) => post.tags.includes(tag));
+  } catch (error) {
+    console.error('Erro ao filtrar posts por tag:', error);
+    return [];
+  }
 }
 
 /**
- * Retorna lista única de todas as categorias usadas nos posts
+ * Retorna lista única de todas as categorias usadas nos posts (MDX + Sanity)
  * @returns Array de categorias em ordem alfabética
  */
-export function getAllCategories(): string[] {
-  const allPosts = getAllPosts();
-  const categories = new Set(allPosts.map((post) => post.category));
-  return Array.from(categories).sort();
+export async function getAllCategories(): Promise<string[]> {
+  try {
+    const allPosts = await getAllPosts();
+    const categories = new Set(allPosts.map((post) => post.category));
+    return Array.from(categories).sort();
+  } catch (error) {
+    console.error('Erro ao buscar categorias:', error);
+    return [];
+  }
 }
 
 /**
- * Retorna lista única de todas as tags usadas nos posts
+ * Retorna lista única de todas as tags usadas nos posts (MDX + Sanity)
  * @returns Array de tags em ordem alfabética
  */
-export function getAllTags(): string[] {
-  const allPosts = getAllPosts();
-  const tags = new Set(allPosts.flatMap((post) => post.tags));
-  return Array.from(tags).sort();
+export async function getAllTags(): Promise<string[]> {
+  try {
+    const allPosts = await getAllPosts();
+    const tags = new Set(allPosts.flatMap((post) => post.tags));
+    return Array.from(tags).sort();
+  } catch (error) {
+    console.error('Erro ao buscar tags:', error);
+    return [];
+  }
+}
+
+/**
+ * Remove posts duplicados pela slug
+ * Prioriza posts do MDX sobre Sanity se tiverem a mesma slug
+ */
+function deduplicatePosts(posts: Post[]): Post[] {
+  const seen = new Set<string>();
+  return posts.filter((post) => {
+    if (seen.has(post.slug)) {
+      return false;
+    }
+    seen.add(post.slug);
+    return true;
+  });
 }
 
 /**

@@ -3,8 +3,10 @@ import PostCard from "../../../components/ui/PostCard";
 import { getPostsByCategory, getAllCategories } from "@/lib/posts";
 import type { BlogCategoryPageProps } from "@/tipos/blog";
 
-export function generateStaticParams(): Array<{ category: string }> {
-  const categories = getAllCategories();
+export async function generateStaticParams(): Promise<
+  Array<{ category: string }>
+> {
+  const categories = await getAllCategories();
   return categories.map((category) => ({ category }));
 }
 
@@ -16,12 +18,11 @@ export async function generateMetadata({
   return { title: `${category} | Blog I.C.L` };
 }
 
-// eslint-disable-next-line require-await
 export default async function CategoryPage({
   params,
 }: BlogCategoryPageProps): Promise<React.ReactElement> {
   const { category } = await params;
-  const posts = getPostsByCategory(category);
+  const posts = await getPostsByCategory(category);
 
   return (
     <Container max="lg" className="prose prose-sm prose-invert px-0 py-10">
