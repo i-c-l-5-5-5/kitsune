@@ -2,6 +2,8 @@
 
 import { useState, type ChangeEvent, type ReactElement } from "react";
 import { getBaseUrl } from "@/lib/getBaseUrl";
+import Card from "../../../components/ui/Card";
+import Badge from "../../../components/ui/Badge";
 
 const themes = [
   { name: "dark", label: "🌙 Dark" },
@@ -46,9 +48,9 @@ export default function GitHubStatsPreview(): ReactElement {
   };
 
   return (
-    <div className="mb-0 flex h-full flex-col rounded-xl border border-[var(--accent-teal)] bg-gradient-to-br from-[rgb(26_77_92_/_10%)] to-[rgb(15_23_42_/_10%)] p-8">
-      <div className="mb-6">
-        <h2 className="mb-2 text-3xl font-bold text-[var(--text-bright)]">
+    <Card as="article" className="homeCard cardHome flex flex-col gap-6 p-6">
+      <div>
+        <h2 className="mb-2 text-2xl font-semibold text-[var(--text-bright)]">
           <i className="fas fa-chart-line mr-3" />
           GitHub Stats SVG
         </h2>
@@ -188,14 +190,19 @@ export default function GitHubStatsPreview(): ReactElement {
       </div>
 
       {/* Código Markdown */}
-      <div className="rounded-lg border border-[var(--accent-teal)] bg-[rgb(15_23_42_/_50%)] p-4">
-        <h3 className="mb-3 font-semibold text-[var(--text-bright)]">
+      <div>
+        <h3 className="mb-2 font-semibold text-[var(--text-bright)]">
           Markdown Preview:
         </h3>
-        <div className="overflow-x-auto rounded bg-[rgb(0_0_0_/_30%)] p-3">
+        <div className="mb-3 overflow-x-auto rounded bg-[rgb(0_0_0_/_30%)] p-3">
           <code className="text-xs text-[var(--accent-cyan)]">{`![GitHub Stats](${codeUrl})`}</code>
         </div>
+        <div className="mt-2">
+          <Badge>
+            <i className="fas fa-code iconWithMarginRight" /> Copiar Markdown
+          </Badge>
+        </div>
       </div>
-    </div>
+    </Card>
   );
 }
