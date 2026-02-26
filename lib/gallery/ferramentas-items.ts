@@ -1,5 +1,8 @@
 import type { SVGItem } from './types';
 
+/**
+ * Array contendo a definição das badges da categoria ferramentas.
+ */
 export const ferramentasItems: SVGItem[] = [
   {
     id: 'badge-cursor',

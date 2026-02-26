@@ -9,12 +9,12 @@ Referências a materiais externos devem ser linkadas e reescritas com palavras p
 
 **Plataforma open-source de badges, SVGs e banners para perfis GitHub**
 
-[![CI](https://github.com/icl/galeria/actions/workflows/ci.yml/badge.svg)](https://github.com/icl/galeria/actions/workflows/ci.yml)
+[![CI](https://github.com/i-c-l-5-5-5/kitsune/actions/workflows/ci.yml/badge.svg)](https://github.com/i-c-l-5-5-5/kitsune/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
 [![Node](https://img.shields.io/badge/Node-24.x-green.svg)](https://nodejs.org)
 [![Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black.svg)](https://vercel.com)
 [![Version](https://img.shields.io/badge/Version-1.0.0-blue.svg)](./package.json)
-[![GitHub stars](https://img.shields.io/github/stars/icl/galeria?style=social)](https://github.com/icl/galeria)
+[![GitHub stars](https://img.shields.io/github/stars/i-c-l-5-5-5/kitsune?style=social)](https://github.com/i-c-l-5-5-5/kitsune)
 
 [Demo](https://galeria-tau-ten.vercel.app) · [Galeria](https://galeria-tau-ten.vercel.app/galeria) · [Blog](https://galeria-tau-ten.vercel.app/blog) · [Documentação](./docs/)
 
@@ -65,8 +65,8 @@ Galeria I.C.L oferece uma coleção completa de SVGs, badges e banners prontos p
 ### Instalação
 
 ```bash
-git clone https://github.com/icl/galeria.git
-cd galeria
+git clone https://github.com/i-c-l-5-5-5/kitsune.git
+cd kitsune
 npm install
 cp .env.example .env.local  # opcional
 npm run dev
@@ -137,16 +137,44 @@ Acesse: http://localhost:3000
 
 ### Scripts principais
 
-| Comando            | Descrição                         |
-| ------------------ | --------------------------------- |
-| `npm run dev`      | Servidor local (port 3000)        |
-| `npm run build`    | Build de produção                 |
-| `npm run start`    | Serve o build                     |
-| `npm run lint`     | Verifica código (ESLint)          |
-| `npm run lint:css` | Verifica CSS (Stylelint)          |
-| `npm run fix:all`  | Formata e corrige automaticamente |
+| Comando                | Descrição                                        |
+| ---------------------- | ------------------------------------------------ |
+| `npm run dev`          | Servidor local (porta 3000)                      |
+| `npm run build`        | Build de produção                                |
+| `npm run start`        | Serve o build em produção                        |
+| `npm run test`         | Roda os testes usando Vitest                     |
+| `npm run formatar`     | Formata e corrige código automaticamente         |
+| `npm run type-check`   | Verifica tipagem do TypeScript                   |
+| `npm run diagnosticar` | Roda diagnóstico geral do projeto via Prometheus |
+| `npm run decap-server` | Inicia proxy local do Decap CMS (acesso offline) |
 
 > Veja todos os scripts em [package.json](./package.json)
+
+---
+
+## Gerenciamento de Conteúdo (CMS)
+
+O projeto utiliza o **Decap CMS** para o gerenciamento fácil das postagens do Blog. Ele não requer banco de dados externo e salva os arquivos com extensão `.mdx` diretamente no seu repositório do GitHub.
+
+### Acessando o CMS Localmente (Offline)
+
+Para criar ou editar conteúdos no seu próprio computador, sem precisar fazer commits manuais:
+
+1. Em um terminal, inicie o servidor principal do Next.js:
+   ```bash
+   npm run dev
+   ```
+2. Em um **segundo terminal**, na mesma pasta, inicie o proxy do CMS local:
+   ```bash
+   npm run decap-server
+   ```
+3. Abra o navegador no endereço: **`http://localhost:3000/admin/index.html`**
+
+### Acessando o CMS em Produção (Online)
+
+Após realizar o deploy (ex: na Vercel), o CMS ficará acessível no seu domínio público através da rota `/admin/index.html` (ex: `https://seu-site.com/admin/index.html`).
+
+**Importante:** Para realizar login no ambiente de produção (online), o painel abrirá a janela de login do GitHub. É necessário configurar um **GitHub OAuth App** (nas configurações de developer da sua conta GitHub) e conectar junto às variáveis de ambiente, de acordo com a documentação do Decap CMS.
 
 ---
 
@@ -196,7 +224,7 @@ Contribuições são bem-vindas! Siga o guia em [CONTRIBUTING.md](./CONTRIBUTING
 
 ### Outros Problemas
 
-Consulte a [documentação de debugging](./docs) ou [abra uma issue](https://github.com/icl/galeria/issues).
+Consulte a [documentação de debugging](./docs) ou [abra uma issue](https://github.com/i-c-l-5-5-5/kitsune/issues).
 
 ---
 
@@ -222,7 +250,7 @@ Auditoria de dependências: [docs/AUDITORIA-LICENCAS.md](./docs/AUDITORIA-LICENC
 ## Contato
 
 - **Site:** https://galeria-tau-ten.vercel.app
-- **GitHub:** https://github.com/icl
-- **Issues:** https://github.com/icl/galeria/issues
+- **GitHub:** https://github.com/i-c-l-5-5-5/kitsune
+- **Issues:** https://github.com/i-c-l-5-5-5/kitsune/issues
 
 ---
