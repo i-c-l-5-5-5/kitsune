@@ -22,7 +22,8 @@
     "podar": "prometheus podar",
     "reestruturar": "prometheus reestruturar",
     "guardian": "prometheus guardian-check",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "decap-server": "npx decap-server"
   },
   "dependencies": {
     "@mdx-js/loader": "^3.1.1",
@@ -39,7 +40,7 @@
     "next": "^16.1.6",
     "next-mdx-remote": "^6.0.0",
     "postcss": "^8.5.6",
-    "prometheus": "file:prometheus-0.3.9.tgz",
+    "prometheus": "file:prometheus-0.4.0.tgz",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "styled-components": "^6.3.9",
