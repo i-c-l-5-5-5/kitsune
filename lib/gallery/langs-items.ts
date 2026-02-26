@@ -9,6 +9,13 @@ export const langsItems: SVGItem[] = [
     category: 'skills',
   },
   {
+    id: 'badge-shell',
+    title: 'Shell',
+    filename: 'badges/langs/badge-shell.svg',
+    alt: 'Badge Shell',
+    category: 'skills',
+  },
+  {
     id: 'badge-cobol',
     title: 'COBOL',
     filename: 'badges/langs/badge-cobol.svg',
