@@ -87,6 +87,7 @@ const SKILLS_LANGS_IDS = new Set<string>([
   'badge-julia',
   'badge-zig',
   'badge-clojure',
+  'badge-shell',
 ]);
 
 const SKILLS_FERRAMENTAS_IDS = new Set<string>([
